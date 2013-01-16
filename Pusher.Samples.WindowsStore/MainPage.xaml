@@ -1,0 +1,56 @@
+﻿<Page
+    x:Class="Pusher.Samples.WindowsStore.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Pusher.Samples.WindowsStore"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    DataContext="{Binding Main, Source={StaticResource Locator}}"
+    mc:Ignorable="d">
+
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Margin="116, 40, 0, 0">
+            <TextBlock Text="Pusher.NET sample" Style="{StaticResource PageHeaderTextStyle}" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+               
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Configuration" Style="{StaticResource SubheaderTextStyle}" Margin="0,0,0,12" />
+                    
+                    <TextBlock  Style="{StaticResource BasicTextStyle}" Text="App key" />
+                    <TextBox Margin="0,0,0,12" Text="{Binding AppKey, Mode=TwoWay}"/>
+
+                    <TextBlock Style="{StaticResource BasicTextStyle}" Text="Channel" />
+                    <TextBox Margin="0,0,0,12" Text="{Binding Channel, Mode=TwoWay}"/>
+
+                    <TextBlock Style="{StaticResource BasicTextStyle}" Text="Authentication URL" />
+                    <TextBox Margin="0,0,0,12" Text="{Binding AuthenticationUrl, Mode=TwoWay}" IsEnabled="{Binding AuthenticationRequired}"/>
+                    <TextBlock>
+                        Supported replacements: <LineBreak/>
+                        {channel}, {socketId}
+                    </TextBlock>
+
+                    <Button HorizontalAlignment="Right" Content="Connect" Command="{Binding ConnectCommand}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Grid.Column="1">
+                    <TextBlock Text="Log" Style="{StaticResource SubheaderTextStyle}" Margin="12,0,0,12"/>
+                    <TextBox Margin="12,0,0,0" Text="{Binding Log}" IsReadOnly="True" 
+                             MinHeight="200"
+                             Foreground="White"
+                             Background="{StaticResource ApplicationPageBackgroundThemeBrush}" 
+                             BorderBrush="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                             AcceptsReturn="True"/>
+                </StackPanel>
+                
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Page>
