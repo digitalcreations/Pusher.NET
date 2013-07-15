@@ -139,7 +139,7 @@ namespace Pusher
 			}
 		}
 
-		internal async Task TriggerEventAsync(Event e)
+		internal async Task TriggerEventAsync(IEvent e)
 		{
 			var json = JsonConvert.SerializeObject(e);
 			_logger.Debug("Sending event {0} to {1}: {2}", e.EventName, e.Channel ?? "all channels", json);

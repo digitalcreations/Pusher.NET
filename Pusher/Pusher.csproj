@@ -49,6 +49,7 @@
     <Compile Include="IAuthenticator.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionFactory.cs" />
+    <Compile Include="IEvent.cs" />
     <Compile Include="IEventContract.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Logger.cs" />
