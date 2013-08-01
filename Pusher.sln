@@ -13,6 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pusher.Samples.WindowsStore
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F1DE06F-0720-4881-BF16-BF9F4F44B333}"
 	ProjectSection(SolutionItems) = preProject
+		Pusher\Pusher.nuspec = Pusher\Pusher.nuspec
 		README.md = README.md
 	EndProjectSection
 EndProject
