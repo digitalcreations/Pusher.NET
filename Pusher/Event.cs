@@ -45,7 +45,7 @@ namespace Pusher
 	}
 
 	[DataContract]
-	public class Event
+	public class Event : IEvent
 	{
 		[DataMember(Name = "event")]
 		public string EventName { get; set; }
