@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace Pusher
 {
 	[DataContract]
-	public class Event<T> : Event
+	public class IncomingEvent<T> : IncomingEvent, IIncomingEvent<T>
 	{
 		private T _dataObject;
 		private string _data;
@@ -30,7 +30,7 @@ namespace Pusher
 			}
 		}
 
-		internal override void FromEvent(Event evt)
+		internal override void FromEvent(IncomingEvent evt)
 		{
 			Channel = evt.Channel;
 			EventName = evt.EventName;
@@ -45,7 +45,7 @@ namespace Pusher
 	}
 
 	[DataContract]
-	public class Event : IEvent
+	public class IncomingEvent : IIncomingEvent
 	{
 		[DataMember(Name = "event")]
 		public string EventName { get; set; }
@@ -56,7 +56,7 @@ namespace Pusher
 		[DataMember(Name = "data")]
 		public virtual string Data { get; set; }
 
-		internal virtual void FromEvent(Event evt)
+		internal virtual void FromEvent(IncomingEvent evt)
 		{
 		}
 

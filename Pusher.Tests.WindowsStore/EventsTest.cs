@@ -8,7 +8,7 @@ namespace Pusher.Tests.WindowsStore
     {
 		class EventSource : EventEmitter
 		{
-			public new void EmitEvent(Event e)
+			public new void EmitEvent(IIncomingEvent e)
 			{
 				base.EmitEvent(e);
 			}
@@ -23,9 +23,9 @@ namespace Pusher.Tests.WindowsStore
         public void TestEventsAreTriggered()
         {
 	        var a = new EventSource();
-	        var e = new Event {Channel = "a", Data = "{}", EventName = "foo"};
+	        var e = new IncomingEvent {Channel = "a", Data = "{}", EventName = "foo"};
 
-			var events = new List<Event>();
+			var events = new List<IIncomingEvent>();
 
 	        a.EventEmitted += (sender, evt) =>
 		        {
@@ -43,10 +43,10 @@ namespace Pusher.Tests.WindowsStore
 		public void TestGenericEvents()
 		{
 			var a = new EventSource();
-			var e = new Event<EventArgs> { Channel = "a", DataObject = new EventArgs { Id = 10 }, EventName = "foo" };
-			(e as Event).Data = "{id:10}";
+			var e = new IncomingEvent<EventArgs> { Channel = "a", DataObject = new EventArgs { Id = 10 }, EventName = "foo" };
+			(e as IncomingEvent).Data = "{id:10}";
 
-			var events = new List<Event>();
+			var events = new List<IIncomingEvent>();
 
 			a.EventEmitted += (sender, evt) =>
 				{

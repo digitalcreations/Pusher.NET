@@ -28,7 +28,7 @@ namespace Pusher.Tests.WindowsStore
 				{
 					OnOpen(this, new EventArgs());
 				}
-				SendData(JsonConvert.SerializeObject(new Event
+				SendData(JsonConvert.SerializeObject(new IncomingEvent
 					{
 						EventName = Pusher.EventConnectionEstablished,
 						Data = "{\"socket_id\":\"a\"}"
@@ -37,11 +37,11 @@ namespace Pusher.Tests.WindowsStore
 
 			public async Task SendMessage(string data)
 			{
-				var evt = JsonConvert.DeserializeObject<Event>(data);
+				var evt = JsonConvert.DeserializeObject<OutgoingEvent<object>>(data);
 				if (evt.EventName == Pusher.EventSubscribe)
 				{
 					var evt2 = JsonConvert.DeserializeObject<SubscribeEvent>(data);
-					SendData(@"{""event"":""pusher_internal:subscription_succeeded"",""data"":""{\""presence\"":{\""count\"":1,\""ids\"":[\""pusher-test\""],\""hash\"":{\""pusher-test\"":null}}}"",""channel"":""" + evt2.DataObject.Channel + @"""}");
+					SendData(@"{""event"":""pusher_internal:subscription_succeeded"",""data"":""{\""presence\"":{\""count\"":1,\""ids\"":[\""pusher-test\""],\""hash\"":{\""pusher-test\"":null}}}"",""channel"":""" + evt2.Data.Channel + @"""}");
 				}
 			}
 
@@ -97,7 +97,7 @@ namespace Pusher.Tests.WindowsStore
 			var factory = new FakeConnectionFactory();
 			var pusher = new Pusher(factory, "abcd1234", new Options { RaiseAllEventsOnPusher = true });
 
-			var events = new List<Event>();
+			var events = new List<IIncomingEvent>();
 
 			pusher.GetEventSubscription<ConnectionEstablishedEventArgs>().EventEmitted += (sender, evt) =>
 				{
@@ -179,7 +179,7 @@ namespace Pusher.Tests.WindowsStore
 			pusher.AddContract(EventContract.Create<FakeEvent>("fooHappened"));
 			await pusher.ConnectAsync();
 
-			var sentEvent = new Event<FakeEvent>
+			var sentEvent = new IncomingEvent<FakeEvent>
 				{
 					Channel = "foo",
 					DataObject = new FakeEvent {Id = 1, Text = "foo"},
@@ -202,7 +202,7 @@ namespace Pusher.Tests.WindowsStore
 					Assert.AreEqual(sentEvent.Channel, receivedEvent.Channel);
 					eventsReceived++;
 
-					Assert.AreEqual(typeof(Event<FakeEvent>), receivedEvent.GetType());
+					Assert.AreEqual(typeof(IncomingEvent<FakeEvent>), receivedEvent.GetType());
 				};
 
 			factory.LastCreated.SendData(JsonConvert.SerializeObject(sentEvent));

@@ -109,15 +109,15 @@ namespace Pusher
 		private void ReceivedEvent(object sender, DataReceivedEventArgs dataReceivedEventArgs)
 		{
 			_logger.Debug("Parsing event: {0}", dataReceivedEventArgs.TextData);
-			var evt = JsonConvert.DeserializeObject<Event>(dataReceivedEventArgs.TextData);
+			var evt = JsonConvert.DeserializeObject<IncomingEvent>(dataReceivedEventArgs.TextData);
 			_logger.Debug("Parsed event {0}", evt.EventName);
 			var contracts = _contracts.Where(e => e.Name == evt.EventName).ToList();
 			if (contracts.Any())
 			{
 				_logger.Debug("Found contract for event '{0}'", evt.EventName);
 				var contract = contracts.First();
-				var type = typeof (Event<>).MakeGenericType(contract.DeserializeAs);
-				var newEvt = (Event) Activator.CreateInstance(type);
+				var type = typeof (IncomingEvent<>).MakeGenericType(contract.DeserializeAs);
+				var newEvt = (IncomingEvent) Activator.CreateInstance(type);
 				newEvt.FromEvent(evt);
 				evt = newEvt;
 			}
@@ -139,7 +139,7 @@ namespace Pusher
 			}
 		}
 
-		internal async Task TriggerEventAsync(IEvent e)
+		internal async Task TriggerEventAsync<T>(IOutgoingEvent<T> e)
 		{
 			var json = JsonConvert.SerializeObject(e);
 			_logger.Debug("Sending event {0} to {1}: {2}", e.EventName, e.Channel ?? "all channels", json);
@@ -163,8 +163,8 @@ namespace Pusher
 			{
 				var socketId = await GetSocketIdAsync();
 				var authentication = await _options.Authenticator.AuthenticateAsync(socketId);
-				subscribeEvent.DataObject.Auth = authentication.Auth;
-				subscribeEvent.DataObject.ChannelData = authentication.ChannelData;
+				subscribeEvent.Data.Auth = authentication.Auth;
+				subscribeEvent.Data.ChannelData = authentication.ChannelData;
 			}
 			if (checkChannelList)
 			{

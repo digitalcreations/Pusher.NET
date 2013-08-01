@@ -40,7 +40,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="ConnectionState.cs" />
     <Compile Include="Events\DataReceivedEventArgs.cs" />
-    <Compile Include="Event.cs" />
+    <Compile Include="IncomingEvent.cs" />
     <Compile Include="EventContract.cs" />
     <Compile Include="EventEmitter.cs" />
     <Compile Include="Exceptions\EventNameInUseException.cs" />
@@ -49,13 +49,15 @@
     <Compile Include="IAuthenticator.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IConnectionFactory.cs" />
-    <Compile Include="IEvent.cs" />
+    <Compile Include="IIncomingEvent.cs" />
     <Compile Include="IEventContract.cs" />
     <Compile Include="ILogger.cs" />
+    <Compile Include="IOutgoingEvent.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Exceptions\MessageForNonSubscribedChannelException.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Events\PresenceData.cs" />
+    <Compile Include="OutgoingEvent.cs" />
     <Compile Include="PresenceChannel.cs" />
     <Compile Include="PrivateChannel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -5,13 +5,13 @@ namespace Pusher
 {
 	public abstract class EventEmitter
 	{
-		public delegate void EventEmittedHandler(object sender, Event e);
+		public delegate void EventEmittedHandler(object sender, IIncomingEvent e);
 
-		public delegate void GenericEventEmittedHandler<T>(object sender, Event<T> e);
+		public delegate void GenericEventEmittedHandler<T>(object sender, IIncomingEvent<T> e);
 
 		private readonly IDictionary<Type, object> _subscriptions = new Dictionary<Type, object>();
 
-		protected internal void EmitEvent(Event e)
+		protected internal void EmitEvent(IIncomingEvent e)
 		{
 			if (EventEmitted != null)
 			{
@@ -38,11 +38,11 @@ namespace Pusher
 		{
 			public event GenericEventEmittedHandler<T> EventEmitted;
 
-			public void TryConvertEvent(object sender, Event e)
+			public void TryConvertEvent(object sender, IIncomingEvent e)
 			{
-				if (e is Event<T> && EventEmitted != null)
+				if (e is IIncomingEvent<T> && EventEmitted != null)
 				{
-					EventEmitted(sender, e as Event<T>);
+					EventEmitted(sender, e as IIncomingEvent<T>);
 				}
 			}
 		}
