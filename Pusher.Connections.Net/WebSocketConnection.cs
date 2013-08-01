@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
-using Pusher.Events;
-using Windows.Networking.Sockets;
-using Windows.Storage.Streams;
+using WebSocket4Net;
+using DataReceivedEventArgs = Pusher.Events.DataReceivedEventArgs;
 
-namespace Pusher.Connections.WindowsStore
+namespace Pusher.Connections.Net
 {
-    public class WebSocket : IConnection, IDisposable
+    public class WebSocketConnection : IConnection
     {
-        private MessageWebSocket _socket;
-        private DataWriter _messageWriter;
+        private WebSocket _socket;
         private readonly Uri _endpoint;
         private ConnectionState _connectionState;
 
-        public WebSocket(Uri endpoint)
+        public WebSocketConnection(Uri endpoint)
         {
             _endpoint = endpoint;
             SetupSocket();
@@ -22,29 +19,27 @@ namespace Pusher.Connections.WindowsStore
 
         private void SetupSocket()
         {
-            _socket = new MessageWebSocket();
-            _socket.Control.MessageType = SocketMessageType.Utf8;
+            _socket = new WebSocket(_endpoint.ToString());
             _socket.Closed += OnSocketClosed;
             _socket.MessageReceived += OnMessageReceived;
         }
 
-        private async void OnMessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
+        private async void OnMessageReceived(object sender, MessageReceivedEventArgs args)
         {
             if (OnData == null) return;
 
-	        var exceptionOccured = false;
+            var exceptionOccured = false;
             try
             {
-                var reader = args.GetDataReader();
-                var text = reader.ReadString(reader.UnconsumedBufferLength);
+                var text = args.Message;
                 OnData(sender, new DataReceivedEventArgs { TextData = text });
             }
             catch (Exception)
             {
-	            exceptionOccured = true;
+                exceptionOccured = true;
             }
-			// cannot await in catch
-	        if (exceptionOccured) await Reconnect();
+            // cannot await in catch
+            if (exceptionOccured) await Reconnect();
         }
 
         private async Task Reconnect()
@@ -54,15 +49,14 @@ namespace Pusher.Connections.WindowsStore
             SetupSocket();
             await Open();
         }
-        
-        private async void OnSocketClosed(IWebSocket sender, WebSocketClosedEventArgs args)
+
+        private async void OnSocketClosed(object sender, EventArgs args)
         {
-            _messageWriter = null;
             if (_connectionState != ConnectionState.Disconnecting)
             {
                 await Reconnect();
             }
-			_connectionState = ConnectionState.Disconnected;
+            _connectionState = ConnectionState.Disconnected;
             if (OnClose != null) OnClose(sender, new EventArgs());
         }
 
@@ -70,9 +64,9 @@ namespace Pusher.Connections.WindowsStore
 
         public void Close()
         {
-			_connectionState = ConnectionState.Disconnecting;
+            _connectionState = ConnectionState.Disconnecting;
             _socket.Close(1000, "Close requested");
-			_connectionState = ConnectionState.Disconnected;
+            _connectionState = ConnectionState.Disconnected;
         }
 
         public async Task Open()
@@ -82,11 +76,12 @@ namespace Pusher.Connections.WindowsStore
                 Close();
                 SetupSocket();
             }
-			_connectionState = ConnectionState.Connecting;
-            await _socket.ConnectAsync(_endpoint);
-            _messageWriter = new DataWriter(_socket.OutputStream);
-			_connectionState = ConnectionState.Connected;
-			if (OnOpen != null)
+
+            _connectionState = ConnectionState.Connecting;
+            _socket.Open();
+            
+            _connectionState = ConnectionState.Connected;
+            if (OnOpen != null)
             {
                 OnOpen(this, new EventArgs());
             }
@@ -94,28 +89,17 @@ namespace Pusher.Connections.WindowsStore
 
         public async Task SendMessage(string data)
         {
-            if (_messageWriter == null)
+            if (_connectionState != ConnectionState.Connected)
             {
                 await Open();
             }
-            Debug.Assert(_messageWriter != null);
 
-            _messageWriter.WriteString(data);
-            await _messageWriter.StoreAsync();
+            _socket.Send(data);
         }
 
         public event EventHandler<EventArgs> OnClose;
         public event EventHandler<EventArgs> OnOpen;
         public event EventHandler<DataReceivedEventArgs> OnData;
-
-        #endregion
-
-        #region Implementation of IDisposable
-
-        public void Dispose()
-        {
-            _socket.Dispose();
-        }
 
         #endregion
     }
