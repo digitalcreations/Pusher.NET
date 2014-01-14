@@ -39,7 +39,7 @@ namespace Pusher.Samples.WindowsStore.ViewModel
 				_url = url;
 			}
 
-			public async Task<IAuthenticationData> AuthenticateAsync(string socketId)
+			public async Task<IAuthenticationData> AuthenticateAsync(string socketId, string channelName)
 			{
 				_replacements["socketId"] = socketId;
 				using (var client = new HttpClient())

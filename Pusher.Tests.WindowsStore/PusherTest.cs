@@ -71,7 +71,7 @@ namespace Pusher.Tests.WindowsStore
 
 		class FakeAuthenticator : IAuthenticator
 		{
-			public async Task<IAuthenticationData> AuthenticateAsync(string socketId)
+			public async Task<IAuthenticationData> AuthenticateAsync(string socketId, string channelName)
 			{
 				return new AuthenticationData
 					{

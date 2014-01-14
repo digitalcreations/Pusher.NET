@@ -162,7 +162,7 @@ namespace Pusher
 			if (channel is PrivateChannel)
 			{
 				var socketId = await GetSocketIdAsync();
-				var authentication = await _options.Authenticator.AuthenticateAsync(socketId);
+				var authentication = await _options.Authenticator.AuthenticateAsync(socketId, channelName);
 				subscribeEvent.Data.Auth = authentication.Auth;
 				subscribeEvent.Data.ChannelData = authentication.ChannelData;
 			}
