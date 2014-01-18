@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>PusherNET</id>
-        <version>0.1</version>
+        <version>0.2</version>
         <title>Pusher.NET</title>
         <authors>vegardlarsen</authors>
         <owners>vegardlarsen</owners>
@@ -11,7 +11,7 @@
         <description>.NET implementation of Pusher.
 
 When installing this package, you will have to provide a connection method. For now we only provide a built-in connection method for Windows Store apps, new up a Pusher.Connections.WindowsStore.WebsocketConnectionFactory for those.</description>
-        <releaseNotes>Initial release.</releaseNotes>
+        <releaseNotes>IAuthenticator interface now receives channel name.</releaseNotes>
         <copyright>Copyright 2013 Digital Creations AS.</copyright>
         <tags>pusher</tags>
         <dependencies>
