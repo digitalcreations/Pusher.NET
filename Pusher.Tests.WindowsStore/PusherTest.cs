@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using Newtonsoft.Json;
 using Pusher.Events;
-using Pusher.Exceptions;
 
 namespace Pusher.Tests.WindowsStore
 {
@@ -28,11 +27,12 @@ namespace Pusher.Tests.WindowsStore
 				{
 					OnOpen(this, new EventArgs());
 				}
-				SendData(JsonConvert.SerializeObject(new IncomingEvent
+				Task.Delay(1).ContinueWith(task => 
+					SendData(JsonConvert.SerializeObject(new IncomingEvent
 					{
 						EventName = Pusher.EventConnectionEstablished,
 						Data = "{\"socket_id\":\"a\"}"
-					}));
+					})));
 			}
 
 			public async Task SendMessage(string data)
@@ -128,21 +128,18 @@ namespace Pusher.Tests.WindowsStore
 			var factory = new FakeConnectionFactory();
 			var pusher = new Pusher(factory, "abcd1234", new Options { RaiseAllEventsOnPusher = false });
 
-			var eventsOnPusher = 0;
-
-			pusher.EventEmitted += (sender, evt) => eventsOnPusher++;
 			await pusher.ConnectAsync();
 
-			Assert.AreEqual(1, eventsOnPusher);
-
+			var eventsOnPusher = 0;
+			pusher.EventEmitted += (sender, evt) => eventsOnPusher++;
 			var eventsOnChannel = 0;
 			var channel = await pusher.SubscribeToChannelAsync("foo");
 			channel.EventEmitted += (sender, evt) => eventsOnChannel++;
 
 			// the subscribe successful event is raised on channel, but it is raised before we can hook up the event
 			Assert.AreEqual(0, eventsOnChannel);
-			// RaiseAllEventsOnPusher prevents the subscribe successful event from being raised on pusher
-			Assert.AreEqual(1, eventsOnPusher);
+			// RaiseAllEventsOnPusher = false prevents the subscribe successful event from being raised on pusher
+			Assert.AreEqual(0, eventsOnPusher);
 		}
 
 		[TestMethod]
