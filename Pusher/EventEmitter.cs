@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Pusher
 {
@@ -45,6 +46,35 @@ namespace Pusher
 					EventEmitted(sender, e as IIncomingEvent<T>);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Wait for a single incoming event of a certain type.
+		/// </summary>
+		/// <typeparam name="TResult">The type of the value you want to extract from the event</typeparam>
+		/// <typeparam name="TEventArgs">The expected event type arguments</typeparam>
+		/// <param name="resultDelegate">A function that produces the result from the event data.</param>
+		/// <returns>The return value produced by resultDelegate</returns>
+		protected async Task<TResult> WaitForSingleEventAsync<TResult, TEventArgs>(
+			Func<object, IIncomingEvent<TEventArgs>, TResult> resultDelegate)
+		{
+			var completionSource = new TaskCompletionSource<TResult>();
+			GenericEventEmittedHandler<TEventArgs> eventHandler =
+				(sender, e) => completionSource.SetResult(resultDelegate(sender, e));
+			var eventSubscription = GetEventSubscription<TEventArgs>();
+			eventSubscription.EventEmitted += eventHandler;
+			var result = await completionSource.Task;
+			eventSubscription.EventEmitted -= eventHandler;
+			return result;
+		}
+
+		/// <summary>
+		/// Wait for a single event of a certain type.
+		/// </summary>
+		/// <returns>An empty task.</returns>
+		protected Task WaitForSingleEventAsync<TEventArgs>()
+		{
+			return WaitForSingleEventAsync<object, TEventArgs>((sender, e) => null);
 		}
 	}
 }

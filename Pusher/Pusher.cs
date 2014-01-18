@@ -77,14 +77,8 @@ namespace Pusher
 					                      ApplicationKey)));
 			_connection.OnData += ReceivedEvent;
 			await _connection.Open();
-			
-			// wait for the connection established event before returning
-			var completionSource = new TaskCompletionSource<string>();
-			GenericEventEmittedHandler<ConnectionEstablishedEventArgs> eventHandler =
-				(sender, e) => completionSource.SetResult(e.DataObject.SocketId);
-			GetEventSubscription<ConnectionEstablishedEventArgs>().EventEmitted += eventHandler;
-			await completionSource.Task;
-			GetEventSubscription<ConnectionEstablishedEventArgs>().EventEmitted -= eventHandler;
+
+			await WaitForSingleEventAsync<ConnectionEstablishedEventArgs>();
 		}
 
 		public void AddContract(IEventContract contract)
@@ -104,14 +98,8 @@ namespace Pusher
 				return SocketId;
 			}
 
-			// wait for ConnectionEstablishedEvent, and use socket ID
-			var completionSource = new TaskCompletionSource<string>();
-			GenericEventEmittedHandler<ConnectionEstablishedEventArgs> eventHandler =
-				(sender, e) => completionSource.SetResult(e.DataObject.SocketId);
-			GetEventSubscription<ConnectionEstablishedEventArgs>().EventEmitted += eventHandler;
-			await completionSource.Task;
-			GetEventSubscription<ConnectionEstablishedEventArgs>().EventEmitted -= eventHandler;
-			return completionSource.Task.Result;
+			return await WaitForSingleEventAsync<string, ConnectionEstablishedEventArgs>(
+				(sender, e) => e.DataObject.SocketId);
 		}
 
 		private void ReceivedEvent(object sender, DataReceivedEventArgs dataReceivedEventArgs)
