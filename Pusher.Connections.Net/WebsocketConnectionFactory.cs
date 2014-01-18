@@ -2,7 +2,7 @@
 
 namespace Pusher.Connections.Net
 {
-    public class WebsocketConnectionFactory : IConnectionFactory
+    public class WebSocketConnectionFactory : IConnectionFactory
     {
         public IConnection Create(Uri endpoint)
         {

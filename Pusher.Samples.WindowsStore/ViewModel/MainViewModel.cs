@@ -89,7 +89,7 @@ namespace Pusher.Samples.WindowsStore.ViewModel
 						{"channel", Channel}
 					});
 			}
-			_pusher = new Pusher(new WebsocketConnectionFactory(), AppKey, options);
+			_pusher = new Pusher(new WebSocketConnectionFactory(), AppKey, options);
 			_pusher.Logger = _logger;
 
 			_logger.Debug("Connecting...");

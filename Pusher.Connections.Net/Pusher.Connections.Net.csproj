@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebSocketConnection.cs" />
-    <Compile Include="WebsocketConnectionFactory.cs" />
+    <Compile Include="WebSocketConnectionFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Pusher\Pusher.csproj">
