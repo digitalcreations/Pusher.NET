@@ -77,6 +77,14 @@ namespace Pusher
 					                      ApplicationKey)));
 			_connection.OnData += ReceivedEvent;
 			await _connection.Open();
+			
+			// wait for the connection established event before returning
+			var completionSource = new TaskCompletionSource<string>();
+			GenericEventEmittedHandler<ConnectionEstablishedEventArgs> eventHandler =
+				(sender, e) => completionSource.SetResult(e.DataObject.SocketId);
+			GetEventSubscription<ConnectionEstablishedEventArgs>().EventEmitted += eventHandler;
+			await completionSource.Task;
+			GetEventSubscription<ConnectionEstablishedEventArgs>().EventEmitted -= eventHandler;
 		}
 
 		public void AddContract(IEventContract contract)
