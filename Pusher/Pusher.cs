@@ -77,9 +77,10 @@ namespace Pusher
 					                      ApplicationKey)));
 			_connection.OnData += ReceivedEvent;
 		    _connection.OnError += OnError;
-			await _connection.Open();
 
-			await WaitForSingleEventAsync<ConnectionEstablishedEventArgs>();
+		    var waitForEventTask = WaitForSingleEventAsync<ConnectionEstablishedEventArgs>();
+			await _connection.Open();
+			await waitForEventTask;
 		}
 
 	    private void OnError(object sender, ExceptionEventArgs e)

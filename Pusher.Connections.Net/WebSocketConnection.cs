@@ -123,8 +123,8 @@ namespace Pusher.Connections.Net
         /// </summary>
         private void Error(Exception e)
         {
-            var handler = OnError;
-            if (handler != null) handler(this, new ExceptionEventArgs { Exception = e });
+            if (OnError == null) return;
+            OnError(this, new ExceptionEventArgs { Exception = e });
         }
 
         public event EventHandler<ExceptionEventArgs> OnError;

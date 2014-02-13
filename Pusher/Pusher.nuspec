@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>PusherNET</id>
-        <version>0.2</version>
+        <version>0.3.1</version>
         <title>Pusher.NET</title>
         <authors>vegardlarsen</authors>
         <owners>vegardlarsen</owners>
@@ -10,18 +10,20 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>.NET implementation of Pusher.
 
-When installing this package, you will have to provide a connection method. For now we only provide a built-in connection method for Windows Store apps, new up a Pusher.Connections.WindowsStore.WebsocketConnectionFactory for those.</description>
-        <releaseNotes>IAuthenticator interface now receives channel name.</releaseNotes>
-        <copyright>Copyright 2013 Digital Creations AS.</copyright>
+When installing this package, you will have to provide a connection method. For now we only provide a built-in connection method for Windows Store apps and .NET 4.5, new up a Pusher.Connections.WindowsStore.WebsocketConnectionFactory or Pusher.Connections.Net.WebsocketConnectionFactory for those.</description>
+        <releaseNotes>.NET 4.5 support, better error handling.</releaseNotes>
+        <copyright>Copyright 2014 Digital Creations AS.</copyright>
         <tags>pusher</tags>
         <dependencies>
-            <dependency id="Microsoft.Bcl.Async" version="1.0.16" />
-            <dependency id="Newtonsoft.Json" version="5.0.5" />
+            <dependency id="Microsoft.Bcl.Async" version="1.0.16"/>
+            <dependency id="Newtonsoft.Json" version="5.0.5"/>
         </dependencies>
     </metadata>
     <files>
-        <file src="..\Pusher.Connections.WindowsStore\bin\Release\Pusher.Connections.WindowsStore.dll" target="lib\netcore45\Pusher.Connections.WindowsStore.dll" />
-        <file src="bin\Release\Pusher.dll" target="lib\netcore45\Pusher.dll" />
-        <file src="bin\Release\Pusher.dll" target="lib\portable-net45+sl5+win8\Pusher.dll" />
+        <file src="..\Pusher.Connections.WindowsStore\bin\Release\Pusher.Connections.WindowsStore.dll" target="lib\netcore45\Pusher.Connections.WindowsStore.dll"/>
+        <file src="..\Pusher.Connections.Net\bin\Release\Pusher.Connections.Net.dll" target="lib\net45\Pusher.Connections.Net.dll"/>
+        <file src="bin\Release\Pusher.dll" target="lib\net45\Pusher.dll"/>
+        <file src="bin\Release\Pusher.dll" target="lib\netcore45\Pusher.dll"/>
+        <file src="bin\Release\Pusher.dll" target="lib\portable-windows8+net45\Pusher.dll"/>
     </files>
 </package>
