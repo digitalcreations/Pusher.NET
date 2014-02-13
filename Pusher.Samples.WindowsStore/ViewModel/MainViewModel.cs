@@ -89,16 +89,20 @@ namespace Pusher.Samples.WindowsStore.ViewModel
 						{"channel", Channel}
 					});
 			}
-			_pusher = new Pusher(new WebSocketConnectionFactory(), AppKey, options);
+
+            var synchronizationContext = SynchronizationContext.Current;
+
+            _pusher = new Pusher(new WebSocketConnectionFactory(), AppKey, options);
 			_pusher.Logger = _logger;
+		    _pusher.ExceptionOccured +=
+		        (sender, args) => synchronizationContext.Post(
+		            x => _logger.Debug("Exception occured: {0}", args.Exception.Message), null);
 
 			_logger.Debug("Connecting...");
 			await _pusher.ConnectAsync();
 			_logger.Debug("Connected!");
 			_logger.Debug("Subscribing to {0}!", Channel);
 			var channel = await _pusher.SubscribeToChannelAsync(Channel);
-
-			var synchronizationContext = SynchronizationContext.Current;
 
 			channel.GetEventSubscription<SubscriptionSucceededEventArgs>().EventEmitted += async (sender, evt) =>
 				{

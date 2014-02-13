@@ -45,7 +45,8 @@ namespace Pusher.Tests.WindowsStore
 				}
 			}
 
-			public void SendData(string data)
+
+		    public void SendData(string data)
 			{
 				if (OnData != null)
 				{
@@ -53,7 +54,8 @@ namespace Pusher.Tests.WindowsStore
 				}
 			}
 
-			public event EventHandler<EventArgs> OnClose;
+            public event EventHandler<ExceptionEventArgs> OnError;
+            public event EventHandler<EventArgs> OnClose;
 			public event EventHandler<EventArgs> OnOpen;
 			public event EventHandler<DataReceivedEventArgs> OnData;
 		}

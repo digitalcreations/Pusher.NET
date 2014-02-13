@@ -76,12 +76,35 @@ namespace Pusher
 			_connection = _connectionFactory.Create(new Uri(string.Format("{0}://ws.pusherapp.com:{1}/app/{2}?protocol=5", _options.SchemeString, _options.Port,
 					                      ApplicationKey)));
 			_connection.OnData += ReceivedEvent;
+		    _connection.OnError += OnError;
 			await _connection.Open();
 
 			await WaitForSingleEventAsync<ConnectionEstablishedEventArgs>();
 		}
 
-		public void AddContract(IEventContract contract)
+	    private void OnError(object sender, ExceptionEventArgs e)
+	    {
+            if (_connection is IDisposable)
+            {
+                (_connection as IDisposable).Dispose();
+            }
+            _connection = null;
+            if (ExceptionOccured == null) return;
+	        ExceptionOccured(this, e);
+	    }
+
+        /// <summary>
+        /// Events that cannot be otherwise caught (e.g. something happens to 
+        /// a connection while you are not doing anything to it) are 
+        /// reported through this event.
+        /// 
+        /// When you receive this event, the connection is permanently broken,
+        /// but you can call ConnectAsync() again (but remember to catch its
+        /// Exceptions).
+        /// </summary>
+	    public EventHandler<ExceptionEventArgs> ExceptionOccured;
+
+	    public void AddContract(IEventContract contract)
 		{
 			if (_contracts.Any(c => c.Name == contract.Name))
 			{
@@ -198,6 +221,7 @@ namespace Pusher
 		public void Disconnect()
 		{
 			_connection.OnData -= ReceivedEvent;
+		    _connection.OnError -= OnError;
 			_connection.Close();
 			_connection = null;
 		}

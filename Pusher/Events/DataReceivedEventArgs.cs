@@ -6,4 +6,9 @@ namespace Pusher.Events
 	{
 		public string TextData { get; set; }
 	}
+
+    public class ExceptionEventArgs : EventArgs
+    {
+        public Exception Exception { get; set; }
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Windows.Globalization.DateTimeFormatting;
 using Pusher.Events;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
@@ -32,19 +33,30 @@ namespace Pusher.Connections.WindowsStore
         {
             if (OnData == null) return;
 
-	        var exceptionOccured = false;
+	        Exception exception = null;
             try
             {
                 var reader = args.GetDataReader();
                 var text = reader.ReadString(reader.UnconsumedBufferLength);
                 OnData(sender, new DataReceivedEventArgs { TextData = text });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-	            exceptionOccured = true;
+                exception = e;
             }
 			// cannot await in catch
-	        if (exceptionOccured) await Reconnect();
+            if (exception != null)
+            {
+                _connectionState = ConnectionState.Failed;
+                try
+                {
+                    await Reconnect();
+                }
+                catch (Exception e)
+                {
+                    Error(e);
+                }
+            }
         }
 
         private async Task Reconnect()
@@ -60,7 +72,16 @@ namespace Pusher.Connections.WindowsStore
             _messageWriter = null;
             if (_connectionState != ConnectionState.Disconnecting)
             {
-                await Reconnect();
+                _connectionState = ConnectionState.Failed;
+                try
+                {
+                    await Reconnect();
+                }
+                catch (Exception e)
+                {
+                    Error(e);
+                    return;
+                }
             }
 			_connectionState = ConnectionState.Disconnected;
             if (OnClose != null) OnClose(sender, new EventArgs());
@@ -102,6 +123,17 @@ namespace Pusher.Connections.WindowsStore
 
             _messageWriter.WriteString(data);
             await _messageWriter.StoreAsync();
+        }
+        
+        public event EventHandler<ExceptionEventArgs> OnError;
+
+        /// <summary>
+        /// Triggered whenever an error occurs whenever we cannot raise an exception (because it could not be caught).
+        /// </summary>
+        private void Error(Exception e)
+        {
+            var handler = OnError;
+            if (handler != null) handler(this, new ExceptionEventArgs { Exception = e });
         }
 
         public event EventHandler<EventArgs> OnClose;

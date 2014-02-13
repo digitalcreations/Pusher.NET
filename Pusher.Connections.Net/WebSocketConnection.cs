@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Pusher.Events;
 using WebSocket4Net;
 using DataReceivedEventArgs = Pusher.Events.DataReceivedEventArgs;
 
@@ -39,7 +40,18 @@ namespace Pusher.Connections.Net
                 exceptionOccured = true;
             }
             // cannot await in catch
-            if (exceptionOccured) await Reconnect();
+            if (exceptionOccured)
+            {
+                _connectionState = ConnectionState.Failed;
+                try
+                {
+                    await Reconnect();
+                }
+                catch (Exception e)
+                {
+                    Error(e);
+                }
+            }
         }
 
         private async Task Reconnect()
@@ -54,7 +66,16 @@ namespace Pusher.Connections.Net
         {
             if (_connectionState != ConnectionState.Disconnecting)
             {
-                await Reconnect();
+                _connectionState = ConnectionState.Failed;
+                try
+                {
+                    await Reconnect();
+                }
+                catch (Exception e)
+                {
+                    Error(e);
+                    return;
+                }
             }
             _connectionState = ConnectionState.Disconnected;
             if (OnClose != null) OnClose(sender, new EventArgs());
@@ -97,6 +118,16 @@ namespace Pusher.Connections.Net
             _socket.Send(data);
         }
 
+        /// <summary>
+        /// Triggered whenever an error occurs whenever we cannot raise an exception (because it could not be caught).
+        /// </summary>
+        private void Error(Exception e)
+        {
+            var handler = OnError;
+            if (handler != null) handler(this, new ExceptionEventArgs { Exception = e });
+        }
+
+        public event EventHandler<ExceptionEventArgs> OnError;
         public event EventHandler<EventArgs> OnClose;
         public event EventHandler<EventArgs> OnOpen;
         public event EventHandler<DataReceivedEventArgs> OnData;
