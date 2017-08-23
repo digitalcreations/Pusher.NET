@@ -92,20 +92,24 @@ namespace Pusher.Connections.Net
 
         public async Task Open()
         {
-            if (_connectionState == ConnectionState.Connected)
+            try
             {
-                Close();
-                SetupSocket();
-            }
+                if (_connectionState == ConnectionState.Connected)
+                {
+                    Close();
+                    SetupSocket();
+                }
 
-            _connectionState = ConnectionState.Connecting;
-            _socket.Open();
-            
-            _connectionState = ConnectionState.Connected;
-            if (OnOpen != null)
-            {
-                OnOpen(this, new EventArgs());
+                _connectionState = ConnectionState.Connecting;
+                _socket.Open();
+
+                _connectionState = ConnectionState.Connected;
+                if (OnOpen != null)
+                {
+                    OnOpen(this, new EventArgs());
+                }
             }
+            catch { }
         }
 
         public async Task SendMessage(string data)
